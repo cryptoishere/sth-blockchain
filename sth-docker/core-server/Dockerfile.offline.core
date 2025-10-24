@@ -59,6 +59,11 @@ COPY ./sth-docker/core-server/core-entry.sh /home/apps/
 
 COPY ./sth-core/ /home/apps/app/
 
+USER root
+# Make sure apps user owns everything
+RUN chown -R apps:apps /home/apps
+USER apps
+
 # Expose ports
 # EXPOSE 4001
 

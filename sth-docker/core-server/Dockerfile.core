@@ -1,0 +1,16 @@
+# Use an official Node.js runtime as a parent image
+FROM node:18
+
+RUN groupadd --gid 1001 apps \
+  && useradd --uid 1001 --gid apps --shell /bin/bash --create-home apps
+
+USER apps
+
+COPY ./sth-docker/core-server/core-entry.sh /home/apps/
+
+WORKDIR /home/apps/app
+
+# Expose ports
+# EXPOSE 4001
+
+CMD ["/home/apps/core-entry.sh"]

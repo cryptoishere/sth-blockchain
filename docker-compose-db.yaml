@@ -1,0 +1,23 @@
+services:
+  postgres:
+    container_name: db_sth_co
+    image: postgres:${POSTGRES_VERSION:-18}
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-sth}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-password}"
+      POSTGRES_DB: "${POSTGRES_DB:-sth_testnet}"
+      PGPASSWORD: "${PGPASSWORD:-docker}"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sth}"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    networks:
+      appnet:
+        ipv4_address: 10.10.10.11
+    command: ["postgres", "-c", "listen_addresses=${POSTGRES_LISTEN:-0.0.0.0}"]
+
+networks:
+  appnet:
+    external: true

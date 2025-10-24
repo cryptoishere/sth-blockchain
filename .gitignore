@@ -1,0 +1,8 @@
+.env
+*.bak
+
+sth-docker/blockchainrootfs/*
+sth-docker/offline-deps/*
+
+sth-core
+sth-rpc-server-rust

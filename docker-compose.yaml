@@ -1,0 +1,39 @@
+services:
+  sth-core:
+    container_name: sth_core_co
+    build:
+      # TODO: 
+      dockerfile: ./sth-docker/core-server/Dockerfile.offline.core.prod
+    working_dir: /home/apps/app
+    ports:
+      - "37.60.224.253:${CORE_P2P_PORT:-4001}:${CORE_P2P_PORT:-4001}"
+    user: apps
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    networks:
+      appnet:
+        ipv4_address: 10.10.10.12
+
+  dev-sth-core:
+    container_name: sth_core_co
+    build:
+      dockerfile: ./sth-docker/core-server/Dockerfile.offline.core
+    working_dir: /home/apps/app
+    ports:
+      - "127.0.0.1:${CORE_P2P_PORT:-4000}:${CORE_P2P_PORT:-4000}"
+    user: apps
+    # volumes:
+    #   - type: bind
+    #     source: ./sth-core
+    #     target: /home/apps/app
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    networks:
+      appnet:
+        ipv4_address: 10.10.10.12
+
+networks:
+  appnet:
+    external: true

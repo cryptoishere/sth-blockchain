@@ -2,11 +2,15 @@ services:
   sth-core:
     container_name: sth_core_co
     build:
-      # TODO: 
-      dockerfile: ./sth-docker/core-server/Dockerfile.offline.core.prod
+      dockerfile: ./sth-docker/core-server/Dockerfile.offline.core
+    restart: "no"
     working_dir: /home/apps/app
+    environment:
+      ENV_PATH: "${ENV_PATH:-mainnet}"
     ports:
       - "37.60.224.253:${CORE_P2P_PORT:-4001}:${CORE_P2P_PORT:-4001}"
+    tmpfs:
+      - /home/apps/.local:uid=1001,gid=1001,mode=0775
     user: apps
     dns:
       - 8.8.8.8
@@ -16,17 +20,18 @@ services:
         ipv4_address: 10.10.10.12
 
   dev-sth-core:
-    container_name: sth_core_co
+    container_name: dev_sth_core_co
     build:
       dockerfile: ./sth-docker/core-server/Dockerfile.offline.core
+    restart: "no"
     working_dir: /home/apps/app
+    environment:
+      ENV_PATH: "${ENV_PATH:-mainnet}"
     ports:
       - "127.0.0.1:${CORE_P2P_PORT:-4000}:${CORE_P2P_PORT:-4000}"
+    tmpfs:
+      - /home/apps/.local:uid=1001,gid=1001,mode=0775
     user: apps
-    # volumes:
-    #   - type: bind
-    #     source: ./sth-core
-    #     target: /home/apps/app
     dns:
       - 8.8.8.8
       - 1.1.1.1

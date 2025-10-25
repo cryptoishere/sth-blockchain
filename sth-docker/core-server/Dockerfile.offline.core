@@ -20,6 +20,7 @@ RUN apt-get update && \
       iproute2 \
       netcat-openbsd \
       dnsutils \
+      wget \
       libjemalloc2 && \
     rm -rf /var/lib/apt/lists/*
 
@@ -62,6 +63,10 @@ COPY ./sth-core/ /home/apps/app/
 USER root
 # Make sure apps user owns everything
 RUN chown -R apps:apps /home/apps
+
+RUN mkdir -p /home/apps/.local/share/sth-core && \
+    chown -R 1001:1001 /home/apps/.local
+
 USER apps
 
 # Expose ports

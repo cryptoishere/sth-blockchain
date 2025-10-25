@@ -56,20 +56,19 @@ RUN yarn --version
 # Copy app files
 WORKDIR /home/apps/app
 COPY ./sth-docker/core-server/core-entry.sh /home/apps/
-# RUN chmod +x /home/apps/core-entry.sh
-
 COPY ./sth-core/ /home/apps/app/
 
 USER root
-# Make sure apps user owns everything
-RUN chown -R apps:apps /home/apps
 
-RUN mkdir -p /home/apps/.local/share/sth-core && \
-    chown -R 1001:1001 /home/apps/.local
+RUN chmod +x /home/apps/core-entry.sh
+
+RUN chown -R apps:apps /home/apps && \
+    mkdir -p /home/apps/.local/share/sth-core && \
+    chown -R apps:apps /home/apps/.local
 
 USER apps
 
-# Expose ports
+# Expose ports if needed
 # EXPOSE 4001
 
 # Start the app

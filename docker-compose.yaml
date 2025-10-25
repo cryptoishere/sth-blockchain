@@ -11,7 +11,7 @@ services:
       - "37.60.224.253:${CORE_P2P_PORT:-4001}:${CORE_P2P_PORT:-4001}"
     tmpfs:
       - /home/apps/.local:uid=1001,gid=1001,mode=0775
-    user: apps
+    user: "${UID_BLOCKCHAIN}:${GID_BLOCKCHAIN}"
     dns:
       - 8.8.8.8
       - 1.1.1.1
@@ -31,7 +31,7 @@ services:
       - "127.0.0.1:${CORE_P2P_PORT:-4000}:${CORE_P2P_PORT:-4000}"
     tmpfs:
       - /home/apps/.local:uid=1001,gid=1001,mode=0775
-    user: apps
+    user: "${UID_BLOCKCHAIN}:${GID_BLOCKCHAIN}"
     dns:
       - 8.8.8.8
       - 1.1.1.1

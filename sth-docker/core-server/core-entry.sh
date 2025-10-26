@@ -42,7 +42,7 @@ if [ "$ENV_PATH" = "mainnet" ]; then
 
   # Start node for mainnet
   # yarn sth relay:start --network=$ENV_PATH
-  yarn sth core:start --network=$ENV_PATH
+  yarn sth core:run --network=$ENV_PATH
 else
   echo "🚫 Not mainnet — skipping snapshot restore."
   yarn full:testnet

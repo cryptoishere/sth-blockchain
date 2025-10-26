@@ -1,0 +1,41 @@
+FROM blockchain-debian:local
+
+# Install prerequisites
+RUN apt-get update && apt-get install -y curl ca-certificates gnupg lsb-release
+
+# Add PostgreSQL repository
+RUN install -d /usr/share/postgresql-common/pgdg \
+    && curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+       > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update
+
+# Install PostgreSQL 18
+RUN apt-get install -y postgresql-18 postgresql-client-18 postgresql-contrib-18 \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/usr/lib/postgresql/18/bin:$PATH"
+
+# Install gosu
+RUN apt-get update && apt-get install -y gnupg2 dirmngr \
+    && set -eux; \
+    ARCH="$(dpkg --print-architecture)"; \
+    curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.16/gosu-$ARCH" ; \
+    curl -o /usr/local/bin/gosu.asc -SL "https://github.com/tianon/gosu/releases/download/1.16/gosu-$ARCH.asc"; \
+    export GNUPGHOME="$(mktemp -d)"; \
+    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+    gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+    rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+    chmod +x /usr/local/bin/gosu
+
+# Copy init scripts
+COPY ./init /docker-entrypoint-initdb.d
+RUN chown -R postgres:postgres /docker-entrypoint-initdb.d \
+    && chmod -R 755 /docker-entrypoint-initdb.d
+
+# Copy entrypoint
+COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["postgres"]

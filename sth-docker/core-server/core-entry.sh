@@ -5,8 +5,27 @@ USER="$(whoami)"
 ENV_PATH="${ENV_PATH:-mainnet}"
 MARKER_FILE="/home/$USER/.local/share/sth-core/$ENV_PATH/.snapshot_restored"
 
+# Default flags from ENV
+SKIP_DOWNLOAD="${SKIP_DOWNLOAD:-false}"
+SKIP_RESTORE="${SKIP_RESTORE:-false}"
+
+# Parse CLI arguments (CLI overrides ENV)
+for arg in "$@"; do
+  case $arg in
+    --skip-download)
+      SKIP_DOWNLOAD=true
+      shift
+      ;;
+    --skip-restore)
+      SKIP_RESTORE=true
+      shift
+      ;;
+  esac
+done
+
 echo "👤 Running as user: $USER"
 echo "🌐 Network: $ENV_PATH"
+echo "⚙️  Options: SKIP_DOWNLOAD=$SKIP_DOWNLOAD, SKIP_RESTORE=$SKIP_RESTORE"
 
 # Install core
 yarn setup:clean
@@ -24,24 +43,33 @@ if [ "$ENV_PATH" = "mainnet" ]; then
   mkdir -p "$SNAPSHOT_DIR"
   cd "$SNAPSHOT_DIR"
 
-  # Restore snapshot only once (first-time setup)
   if [ ! -f "$MARKER_FILE" ]; then
-    echo "📦 First-time setup detected on mainnet. Downloading and restoring snapshot..."
-    wget -q "$SNAPSHOT_URL"
-    tar -zxf "$SNAPSHOT_FILE"
-    rm "$SNAPSHOT_FILE"
+    echo "📦 First-time setup detected on mainnet."
 
-    cd /home/$USER/app/packages/core
-    yarn sth snapshot:restore --blocks 1-8133951
+    if [ "$SKIP_DOWNLOAD" = false ]; then
+      echo "⬇️  Downloading and extracting snapshot..."
+      wget -q "$SNAPSHOT_URL"
+      tar -zxf "$SNAPSHOT_FILE"
+      rm "$SNAPSHOT_FILE"
+    else
+      echo "⏭️  Skipping snapshot download/extraction."
+    fi
+
+    if [ "$SKIP_RESTORE" = false ]; then
+      echo "🧩 Restoring snapshot blocks..."
+      cd /home/$USER/app/packages/core
+      yarn sth snapshot:restore --blocks 1-8133951
+    else
+      echo "⏭️  Skipping snapshot restore."
+    fi
 
     touch "$MARKER_FILE"
-    echo "✅ Snapshot restored and marker file created at $MARKER_FILE"
+    echo "✅ Snapshot process complete and marker file created at $MARKER_FILE"
   else
     echo "✅ Snapshot already restored previously. Skipping restore."
   fi
 
-  # Start node for mainnet
-  # yarn sth relay:start --network=$ENV_PATH
+  echo "🚀 Starting node for mainnet..."
   yarn sth core:run --network=$ENV_PATH
 else
   echo "🚫 Not mainnet — skipping snapshot restore."

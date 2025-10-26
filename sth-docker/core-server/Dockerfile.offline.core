@@ -74,5 +74,7 @@ USER apps
 # Expose ports if needed
 # EXPOSE 4001
 
+ENV SKIP_DOWNLOAD=true
+ENV SKIP_RESTORE=true
 # Start the app
-CMD ["/home/apps/core-entry.sh"]
+CMD ["/home/apps/core-entry.sh", "--skip-download", "--skip-restore"]

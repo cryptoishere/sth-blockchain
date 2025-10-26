@@ -35,8 +35,16 @@ WORKDIR /home/apps
 # Install Yarn globally
 RUN corepack enable && corepack prepare yarn@stable --activate
 
-# Verify Yarn installation
+# --- Install PM2 globally for the apps user ---
+RUN npm config set prefix '/home/apps/.local' \
+    && npm install -g pm2 \
+    && /home/apps/.local/bin/pm2 --version
+
+ENV PATH="/home/apps/.local/bin:${PATH}"
+
+# Verify installation
 RUN yarn --version
+RUN pm2 --version
 
 # Copy app files
 WORKDIR /home/apps/app

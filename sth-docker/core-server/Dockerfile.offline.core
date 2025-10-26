@@ -47,16 +47,13 @@ RUN bash /home/apps/install.sh --version 1.22.22 && \
     rm /home/apps/install.sh && \
     mkdir -p /home/apps/.yarn/bin
 
-# --- Install PM2 globally for the apps user ---
-RUN npm config set prefix '/home/apps/.local' \
-    && npm install -g pm2 \
-    && /home/apps/.local/bin/pm2 --version
+# Install PM2 in persistent user directory (/home/apps/.tools)
+RUN mkdir -p /home/apps/.tools && \
+    npm config set prefix '/home/apps/.tools' && \
+    npm install -g pm2 && \
+    /home/apps/.tools/bin/pm2 --version
 
-ENV PATH="/home/apps/.local/bin:/home/apps/.yarn/bin:/home/apps/.config/yarn/global/node_modules/.bin:${PATH}"
-
-# Verify installation
-RUN yarn --version
-RUN pm2 --version
+ENV PATH="/home/apps/.tools/bin:/home/apps/.yarn/bin:/home/apps/.config/yarn/global/node_modules/.bin:${PATH}"
 
 # Copy app files
 WORKDIR /home/apps/app
@@ -67,9 +64,10 @@ USER root
 
 RUN chmod +x /home/apps/core-entry.sh
 
-RUN chown -R apps:apps /home/apps && \
-    mkdir -p /home/apps/.local/share/sth-core && \
+RUN chown -R apps:apps /home/apps
+RUN mkdir -p /home/apps/.local/share/sth-core && \
     chown -R apps:apps /home/apps/.local
+RUN chown -R apps:apps /home/apps/.tools
 
 USER apps
 

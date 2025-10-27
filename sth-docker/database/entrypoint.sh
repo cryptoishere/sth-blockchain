@@ -22,34 +22,34 @@ if [ ! -f "$DATA_DIR/PG_VERSION" ]; then
     echo "Starting Postgres temporarily to create 'postgres' superuser and run init scripts..."
     gosu postgres pg_ctl -D "$DATA_DIR" -o "-c listen_addresses='localhost'" -w start
 
-# Create superuser 'postgres' if it doesn't exist
-gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
-DO
-\$do\$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'postgres') THEN
-        CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD '$POSTGRES_PASSWORD';
-    END IF;
-END
-\$do\$;
+    # Create superuser 'postgres' if it doesn't exist
+    gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
+        DO
+        \$do\$
+        BEGIN
+            IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'postgres') THEN
+                CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD '$POSTGRES_PASSWORD';
+            END IF;
+        END
+        \$do\$;
 EOSQL
 
-# Create your user if it doesn't exist
-gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
-DO
-\$do\$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$POSTGRES_USER') THEN
-        CREATE ROLE "$POSTGRES_USER" LOGIN PASSWORD '$POSTGRES_PASSWORD';
-    END IF;
-END
-\$do\$;
+    # Create your user if it doesn't exist
+    gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
+        DO
+        \$do\$
+        BEGIN
+            IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$POSTGRES_USER') THEN
+                CREATE ROLE "$POSTGRES_USER" LOGIN PASSWORD '$POSTGRES_PASSWORD';
+            END IF;
+        END
+        \$do\$;
 EOSQL
 
-# Create your database if it doesn't exist
-gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
-    SELECT 'CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$POSTGRES_DB')\gexec
+    # Create your database if it doesn't exist
+    gosu postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
+        SELECT 'CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER'
+        WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$POSTGRES_DB')\gexec
 EOSQL
 
     # Run init scripts
@@ -62,7 +62,7 @@ EOSQL
         esac
     done
 
-    # # Stop temporary server
+    # Stop temporary server
     gosu postgres pg_ctl -D "$DATA_DIR" -m fast -w stop
 fi
 

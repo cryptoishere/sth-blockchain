@@ -19,7 +19,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # Let the default entrypoint handle DB init scripts inside /docker-entrypoint-initdb.d
     command: ["postgres"]
 
 networks:

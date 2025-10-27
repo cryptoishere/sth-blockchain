@@ -16,7 +16,7 @@ if [ ! -f "$DATA_DIR/PG_VERSION" ]; then
     gosu postgres initdb -D "$DATA_DIR" -A md5 --auth-local=trust --auth-host=md5
 
     # Allow remote password access from your network
-    echo "host all all 10.10.10.0/24 md5" >> "$DATA_DIR/pg_hba.conf"
+    echo "host all all 10.10.10.0/28 md5" >> "$DATA_DIR/pg_hba.conf"
 
     # Start Postgres temporarily
     echo "Starting Postgres temporarily to create 'postgres' superuser and run init scripts..."

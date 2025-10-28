@@ -57,7 +57,6 @@ if [ "$ENV_PATH" = "mainnet" ]; then
 
     if [ "$SKIP_RESTORE" = false ]; then
       echo "🧩 Restoring snapshot blocks..."
-      cd /home/$USER/app/packages/core
       yarn sth snapshot:restore --blocks 1-8133951
     else
       echo "⏭️  Skipping snapshot restore."
@@ -68,6 +67,8 @@ if [ "$ENV_PATH" = "mainnet" ]; then
   else
     echo "✅ Snapshot already restored previously. Skipping restore."
   fi
+
+  cd /home/$USER/app/packages/core
 
   echo "🚀 Starting node for mainnet..."
   yarn sth core:run --network=$ENV_PATH

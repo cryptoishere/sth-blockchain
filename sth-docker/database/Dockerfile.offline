@@ -3,6 +3,10 @@ FROM blockchain-debian:local
 # Install prerequisites
 RUN apt-get update && apt-get install -y curl ca-certificates gnupg lsb-release
 
+# Pre-create postgres user & group before PostgreSQL installation
+RUN groupadd -g 1003 postgres && \
+    useradd -u 1003 -g 1003 -r -d /var/lib/postgresql -s /bin/bash postgres
+
 # Add PostgreSQL repository
 RUN install -d /usr/share/postgresql-common/pgdg \
     && curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc \

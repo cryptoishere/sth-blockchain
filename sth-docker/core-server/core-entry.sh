@@ -57,6 +57,8 @@ if [ "$ENV_PATH" = "mainnet" ]; then
 
     if [ "$SKIP_RESTORE" = false ]; then
       echo "🧩 Restoring snapshot blocks..."
+
+      cd /home/$USER/app/packages/core
       yarn sth snapshot:restore --blocks 1-8133951
     else
       echo "⏭️  Skipping snapshot restore."
